@@ -1,0 +1,19 @@
+[package]
+name = "rust_renders"
+version = "0.1.0"
+authors = ["Zakhar Koval <Zakhar.Koval@jetbrains.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.release]
+opt-level = 3
+
+[features]
+default = []
+enable_sse = []
+
+[dependencies]
+rand = "0.7.3"
+fast_inv_sqrt = "~1.0"
+rayon = "1.4.0"
