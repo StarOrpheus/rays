@@ -1,12 +1,12 @@
-use crate::vec3::vec3::{Vec3, Point3, Color};
-use crate::sphere::sphere::Sphere;
-use crate::hittable::hittable::{HittableArray};
-use crate::camera::camera::Camera;
-use crate::image_config::image_config::ImageConfig;
-use crate::material::material::{Lambertian, Metal, Glass, Light};
-use rayon::prelude::*;
-use std::sync::{Mutex};
 use std::rc::Rc;
+use crate::camera::Camera;
+use crate::hittable::{HittableArray};
+use crate::image_config::ImageConfig;
+use crate::material::{Glass, Lambertian, Light, Material, Metal};
+use crate::progress_listener::StderrListener;
+use crate::render::render_fn;
+use crate::sphere::Sphere;
+use crate::vec3::{Color, Point3, Vec3};
 
 mod vec3;
 mod ray;
@@ -15,6 +15,8 @@ mod sphere;
 mod camera;
 mod image_config;
 mod material;
+mod progress_listener;
+mod render;
 
 fn main() {
     let config = ImageConfig::default_config();
@@ -27,12 +29,11 @@ fn main() {
         look_at,
         Vec3::new(0., 1., 0.),
         70.,
-        ImageConfig::default_config().aspect_ratio,
+        config.aspect_ratio(),
         1.0 / 6.,
         (look_from - Vec3::new(0.0, 0.0, -1.0)).length()
     );
 
-    let color_scale_factor = 1.0 / config.samples_per_pixel as f32;
     let ground_material
         = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
     let center_sphere_material
@@ -52,23 +53,12 @@ fn main() {
     world.add(Box::new(Sphere::new(Point3::new(3.0,    0.0,  1.0), 0.5, light_source_material)));
     let world = world;
 
+    let result = render_fn(&mut StderrListener{}, &config, &camera, &world);
+
     print!("P3\n{} {}\n255\n", config.width, config.height);
-
-    let mut result: Vec<(usize, Vec<Color>)> = Vec::new();
-
-    for j in (0..config.height - 1).rev() {
-        eprint!("\rScanlines remaining: {}   ", j);
+    for j in 0..config.height {
         for i in 0..config.width {
-            let mut color = Color::new(0.0, 0.0, 0.0);
-            for s in 0..config.samples_per_pixel {
-                let u = ((i as f32) + rand::random::<f32>()) / ((config.width - 1) as f32);
-                let v = ((j as f32) + rand::random::<f32>()) / ((config.height - 1) as f32);
-
-                let r = camera.get_ray(u, v);
-                let new_color = r.ray_color(&world, color_scale_factor, config.depth);
-                color += new_color;
-            }
-            println!("{}", color);
+            println!("{}", result[(j * config.width + i) as usize]);
         }
     }
 }

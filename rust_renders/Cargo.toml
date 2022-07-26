@@ -15,5 +15,3 @@ enable_sse = []
 
 [dependencies]
 rand = "0.7.3"
-fast_inv_sqrt = "~1.0"
-rayon = "1.4.0"
