@@ -13,10 +13,10 @@ impl ImageConfig {
     }
 
     pub fn default_config() -> ImageConfig {
-        static WIDTH: u32 = 640;
-        static HEIGHT: u32 = 480;//(WIDTH as f32 / ASPECT_RATIO) as u32;
+        static WIDTH: u32 = 1920;
+        static HEIGHT: u32 = 1080;//(WIDTH as f32 / ASPECT_RATIO) as u32;
         static SAMPLES_PER_PIXEL: u32 = 100;
-        static DEPTH: u32 = 30;
+        static DEPTH: u32 = 5;
         static COLOR_SCALE: f32 = 1.0 / SAMPLES_PER_PIXEL as f32;
 
         ImageConfig {

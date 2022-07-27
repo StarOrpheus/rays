@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::{Point3, Vec3};
 use crate::material::Material;
 use crate::ray::Ray;
@@ -8,7 +8,7 @@ pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f32,
-    pub material: Rc<dyn Material>,
+    pub material: Arc<dyn Material>,
     pub front_face: bool,
 }
 
@@ -24,7 +24,7 @@ impl HitRecord {
     pub fn new(p: Point3,
                normal: Vec3,
                t: f32,
-               material: Rc<dyn Material>)
+               material: Arc<dyn Material>)
                -> HitRecord
     {
         HitRecord { p, normal, t, material, front_face: false }
@@ -40,7 +40,7 @@ impl HitRecord {
 }
 
 pub struct HittableArray {
-    imp: Vec<Box<dyn Hittable>>,
+    imp: Vec<Arc<dyn Hittable + Send + Sync>>,
 }
 
 impl HittableArray {
@@ -62,7 +62,7 @@ impl HittableArray {
         self.imp.clear();
     }
 
-    pub fn add(&mut self, obj: Box<dyn Hittable>) {
+    pub fn add(&mut self, obj: Arc<dyn Hittable + Send + Sync>) {
         self.imp.push(obj);
     }
 }
